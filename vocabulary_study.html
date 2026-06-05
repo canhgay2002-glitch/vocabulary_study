@@ -1,0 +1,1556 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Từ vựng đề thi 惣菜専門級</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Segoe UI', sans-serif; background: #f0f4f8; color: #222; }
+  header { background: #1a3a5c; color: white; padding: 18px 24px; }
+  header h1 { font-size: 1.3rem; }
+  header p { font-size: 0.85rem; opacity: 0.8; margin-top: 4px; }
+
+  .controls { display: flex; gap: 10px; flex-wrap: wrap; padding: 14px 20px; background: white; border-bottom: 1px solid #ddd; align-items: center; }
+  .controls input { flex: 1; min-width: 180px; padding: 8px 12px; border: 1px solid #ccc; border-radius: 6px; font-size: 0.9rem; }
+  .controls select { padding: 8px 12px; border: 1px solid #ccc; border-radius: 6px; font-size: 0.9rem; }
+  .btn { padding: 8px 16px; border: none; border-radius: 6px; cursor: pointer; font-size: 0.85rem; font-weight: 600; }
+  .btn-primary { background: #1a3a5c; color: white; }
+  .btn-success { background: #27ae60; color: white; }
+  .btn-warning { background: #e67e22; color: white; }
+
+  .stats { display: flex; gap: 16px; padding: 10px 20px; background: #eaf0fb; flex-wrap: wrap; }
+  .stat { font-size: 0.82rem; color: #555; }
+  .stat span { font-weight: 700; color: #1a3a5c; }
+
+  .main { padding: 16px 20px; }
+
+  .question-card { background: white; border-radius: 10px; margin-bottom: 14px; box-shadow: 0 2px 6px rgba(0,0,0,0.07); overflow: hidden; }
+  .q-header { display: flex; align-items: center; gap: 10px; padding: 12px 16px; background: #1a3a5c; color: white; cursor: pointer; }
+  .q-num { background: #e67e22; border-radius: 50%; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.85rem; flex-shrink: 0; }
+  .q-title { font-size: 0.92rem; flex: 1; line-height: 1.4; }
+  .q-arrow { transition: transform 0.2s; font-size: 0.8rem; }
+  .q-arrow.open { transform: rotate(180deg); }
+
+  .q-body { display: none; padding: 14px 16px; }
+  .q-body.open { display: block; }
+
+  .q-text { background: #f8f9fa; border-left: 3px solid #1a3a5c; padding: 10px 12px; border-radius: 4px; font-size: 0.88rem; line-height: 1.7; margin-bottom: 14px; }
+  .q-text .option { margin-top: 4px; color: #444; }
+
+  .vocab-table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+  .vocab-table th { background: #1a3a5c; color: white; padding: 8px 10px; text-align: left; }
+  .vocab-table td { padding: 8px 10px; border-bottom: 1px solid #eee; vertical-align: top; }
+  .vocab-table tr:hover td { background: #f0f4f8; }
+  .jp { font-size: 1rem; font-weight: 600; color: #1a3a5c; }
+  .reading { color: #666; font-size: 0.8rem; }
+  .vi { color: #27ae60; }
+  .example { color: #777; font-size: 0.78rem; font-style: italic; }
+
+  .answer-badge { display: inline-block; padding: 2px 10px; border-radius: 12px; font-size: 0.78rem; font-weight: 700; margin-bottom: 10px; }
+  .answer-badge.correct { background: #d4edda; color: #155724; }
+
+  .tag { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 0.72rem; background: #e8f0fe; color: #1a3a5c; margin: 2px; }
+
+  .flashcard-mode { display: none; }
+  .flashcard-mode.active { display: block; }
+  .normal-mode.hidden { display: none; }
+
+  .flashcard { background: white; border-radius: 14px; box-shadow: 0 4px 20px rgba(0,0,0,0.12); padding: 30px; text-align: center; max-width: 500px; margin: 20px auto; min-height: 200px; display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; transition: transform 0.1s; }
+  .flashcard:active { transform: scale(0.98); }
+  .fc-jp { font-size: 2rem; font-weight: 700; color: #1a3a5c; margin-bottom: 8px; }
+  .fc-reading { color: #888; font-size: 1rem; margin-bottom: 10px; }
+  .fc-vi { font-size: 1.2rem; color: #27ae60; }
+  .fc-hint { color: #bbb; font-size: 0.85rem; margin-top: 16px; }
+  .fc-controls { display: flex; gap: 12px; justify-content: center; margin-top: 16px; flex-wrap: wrap; }
+  .fc-progress { text-align: center; color: #888; font-size: 0.85rem; margin-top: 8px; }
+
+  .no-result { text-align: center; padding: 40px; color: #888; }
+
+  @media (max-width: 600px) {
+    .vocab-table { font-size: 0.78rem; }
+    .fc-jp { font-size: 1.5rem; }
+  }
+</style>
+</head>
+<body>
+<header>
+  <h1>📚 Từ vựng đề thi 惣菜専門級</h1>
+  <p>101 câu hỏi · Phân tích từ vựng theo từng câu</p>
+</header>
+
+<div class="controls">
+  <input type="text" id="searchInput" placeholder="🔍 Tìm từ vựng hoặc số câu..." oninput="filterQuestions()">
+  <select id="topicFilter" onchange="filterQuestions()">
+    <option value="">-- Tất cả chủ đề --</option>
+    <option value="trang phục">Trang phục & bảo hộ</option>
+    <option value="vệ sinh">Vệ sinh & sức khỏe</option>
+    <option value="khử trùng">Khử trùng & tẩy rửa</option>
+    <option value="máy móc">Máy móc & thiết bị</option>
+    <option value="bảo quản">Bảo quản thực phẩm</option>
+    <option value="nấu ăn">Kỹ thuật nấu ăn</option>
+    <option value="an toàn">An toàn lao động</option>
+    <option value="đo lường">Đo lường & kiểm tra</option>
+    <option value="ngộ độc">Ngộ độc thực phẩm</option>
+    <option value="quy tắc">Quy tắc nhà máy</option>
+  </select>
+  <button class="btn btn-primary" onclick="expandAll()">Mở tất cả</button>
+  <button class="btn btn-warning" onclick="collapseAll()">Đóng tất cả</button>
+  <button class="btn btn-success" onclick="toggleFlashcard()">🃏 Flashcard</button>
+</div>
+
+<div class="stats">
+  <div class="stat">Tổng câu: <span id="totalQ">101</span></div>
+  <div class="stat">Đang hiện: <span id="showingQ">101</span></div>
+  <div class="stat">Tổng từ vựng: <span id="totalV">0</span></div>
+</div>
+
+<div id="flashcardSection" class="flashcard-mode">
+  <div class="flashcard" onclick="toggleFCAnswer()">
+    <div class="fc-jp" id="fcJp">-</div>
+    <div class="fc-reading" id="fcReading"></div>
+    <div class="fc-vi" id="fcVi" style="display:none"></div>
+    <div class="fc-hint" id="fcHint">👆 Nhấn để xem nghĩa</div>
+  </div>
+  <div class="fc-progress" id="fcProgress"></div>
+  <div class="fc-controls">
+    <button class="btn btn-primary" onclick="fcPrev()">← Trước</button>
+    <button class="btn btn-success" onclick="fcNext()">Tiếp →</button>
+    <button class="btn btn-warning" onclick="fcShuffle()">🔀 Xáo trộn</button>
+    <button class="btn" style="background:#e74c3c;color:white" onclick="toggleFlashcard()">✕ Đóng</button>
+  </div>
+</div>
+
+<div class="main normal-mode" id="normalMode">
+  <div id="questionList"></div>
+  <div id="noResult" class="no-result" style="display:none">Không tìm thấy kết quả.</div>
+</div>
+
+<script>
+const data = [
+  {
+    num: 1,
+    topic: "trang phục",
+    question: "作業着について、まちがっているものを一つえらびなさい。",
+    options: ["作業者は、いつも清潔なものを着なければならない。", "清潔な服なら、なにを着てもよい", "作業着は、決められた着かたをしなければならない。"],
+    answer: 2,
+    answerNote: "清潔でも何でも着てよいわけではない。決められた作業着を着なければならない。",
+    vocab: [
+      { jp: "作業着", reading: "さぎょうぎ", vi: "quần áo làm việc / đồng phục lao động", example: "作業着を着てください。" },
+      { jp: "清潔", reading: "せいけつ", vi: "sạch sẽ, vệ sinh", example: "清潔な服を着る。" },
+      { jp: "作業者", reading: "さぎょうしゃ", vi: "người lao động / công nhân", example: "" },
+      { jp: "決められた", reading: "きめられた", vi: "đã được quy định / theo quy định", example: "決められた着かたをする。" },
+      { jp: "着かた", reading: "きかた", vi: "cách mặc", example: "" },
+    ]
+  },
+  {
+    num: 2,
+    topic: "đo lường",
+    question: "油の温度をはかる時で正しいものを一つえらびなさい",
+    options: ["底をはかる", "表面をはかる", "中心をはかる"],
+    answer: 3,
+    answerNote: "油の温度は中心（真ん中）ではかる。",
+    vocab: [
+      { jp: "油", reading: "あぶら", vi: "dầu ăn / chất béo", example: "油の温度をはかる。" },
+      { jp: "温度", reading: "おんど", vi: "nhiệt độ", example: "温度を確認する。" },
+      { jp: "はかる", reading: "はかる", vi: "đo, đo lường", example: "温度をはかる。" },
+      { jp: "底", reading: "そこ", vi: "đáy", example: "鍋の底。" },
+      { jp: "表面", reading: "ひょうめん", vi: "bề mặt", example: "表面の温度。" },
+      { jp: "中心", reading: "ちゅうしん", vi: "trung tâm, chính giữa", example: "中心をはかる。" },
+    ]
+  },
+  {
+    num: 3,
+    topic: "đo lường",
+    question: "リトマス紙はどのようなときに使いますか。",
+    options: ["油の品質をはかる時。", "温度をはかる時。", "pH（ペーハー）をはかる時。"],
+    answer: 3,
+    answerNote: "リトマス紙はpH（酸性・アルカリ性）をはかるために使う。",
+    vocab: [
+      { jp: "リトマス紙", reading: "りとますし", vi: "giấy quỳ tím (litmus)", example: "リトマス紙でpHをはかる。" },
+      { jp: "品質", reading: "ひんしつ", vi: "chất lượng", example: "油の品質をはかる。" },
+      { jp: "pH（ペーハー）", reading: "ぺーはー", vi: "độ pH (axit/kiềm)", example: "pHをはかる。" },
+    ]
+  },
+  {
+    num: 4,
+    topic: "quy tắc",
+    question: "作業場に持って入ってよいものを一つえらびなさい。",
+    options: ["お金やたばこ。", "鉛や薬。", "ロッカーの鍵。"],
+    answer: 3,
+    answerNote: "作業場に持ち込めるのはロッカーの鍵のみ。",
+    vocab: [
+      { jp: "作業場", reading: "さぎょうば", vi: "khu vực làm việc / xưởng sản xuất", example: "作業場に入る。" },
+      { jp: "持って入る", reading: "もっていれる", vi: "mang vào", example: "作業場に持って入る。" },
+      { jp: "たばこ", reading: "たばこ", vi: "thuốc lá", example: "" },
+      { jp: "鉛", reading: "なまり", vi: "chì (kim loại)", example: "" },
+      { jp: "薬", reading: "くすり", vi: "thuốc", example: "" },
+      { jp: "ロッカーの鍵", reading: "ろっかーのかぎ", vi: "chìa khóa tủ đồ", example: "ロッカーの鍵を持つ。" },
+    ]
+  },
+  {
+    num: 5,
+    topic: "bảo quản",
+    question: "食材の扱い方について、まちがっているものを一つえらびなさい。",
+    options: ["冷凍品がとけていたら、また冷凍する。", "砂糖や塩は、湿度が低いところに保管する。", "小麦粉やでんぷんは、水にぬれないように。"],
+    answer: 1,
+    answerNote: "一度解凍した食材は再冷凍してはいけない。品質と安全性が下がる。",
+    vocab: [
+      { jp: "食材", reading: "しょくざい", vi: "nguyên liệu thực phẩm", example: "食材を保管する。" },
+      { jp: "扱い方", reading: "あつかいかた", vi: "cách xử lý / cách sử dụng", example: "食材の扱い方。" },
+      { jp: "冷凍品", reading: "れいとうひん", vi: "thực phẩm đông lạnh", example: "冷凍品を保管する。" },
+      { jp: "とける", reading: "とける", vi: "tan chảy / rã đông", example: "氷がとける。" },
+      { jp: "冷凍", reading: "れいとう", vi: "đông lạnh", example: "また冷凍する。" },
+      { jp: "砂糖", reading: "さとう", vi: "đường", example: "砂糖を保管する。" },
+      { jp: "塩", reading: "しお", vi: "muối", example: "塩を保管する。" },
+      { jp: "湿度", reading: "しつど", vi: "độ ẩm", example: "湿度が低い場所。" },
+      { jp: "保管", reading: "ほかん", vi: "bảo quản, lưu trữ", example: "食材を保管する。" },
+      { jp: "小麦粉", reading: "こむぎこ", vi: "bột mì", example: "小麦粉を保管する。" },
+      { jp: "でんぷん", reading: "でんぷん", vi: "tinh bột", example: "でんぷんは水にぬれないように。" },
+    ]
+  },
+  {
+    num: 6,
+    topic: "khử trùng",
+    question: "殺菌剤を使うときに注意する点として、まちがっているものを一つえらびなさい。",
+    options: ["殺菌剤の濃度。", "殺菌する時間。", "殺菌剤の温度。"],
+    answer: 3,
+    answerNote: "殺菌剤使用の注意点は「濃度」と「時間」。温度は主な注意点ではない。",
+    vocab: [
+      { jp: "殺菌剤", reading: "さっきんざい", vi: "chất khử trùng / thuốc diệt khuẩn", example: "殺菌剤を使う。" },
+      { jp: "注意する点", reading: "ちゅういするてん", vi: "điểm cần chú ý", example: "" },
+      { jp: "濃度", reading: "のうど", vi: "nồng độ", example: "殺菌剤の濃度を確認する。" },
+      { jp: "時間", reading: "じかん", vi: "thời gian", example: "殺菌する時間。" },
+    ]
+  },
+  {
+    num: 7,
+    topic: "an toàn",
+    question: "事故を防ぐ方法として、まちがっているものを一つえらびなさい。",
+    options: ["非常停止ボタンを押して機械を止めた。", "冷蔵庫のとびらを閉めるまえに、中に人がいないか確認する。", "油の温度を確認せずフライヤーの油を交換する。"],
+    answer: 3,
+    answerNote: "油の温度を確認せずに交換するのは非常に危険。必ず確認してから行う。",
+    vocab: [
+      { jp: "事故", reading: "じこ", vi: "tai nạn", example: "事故を防ぐ。" },
+      { jp: "防ぐ", reading: "ふせぐ", vi: "ngăn ngừa / phòng tránh", example: "危険を防ぐ。" },
+      { jp: "非常停止ボタン", reading: "ひじょうていしぼたん", vi: "nút dừng khẩn cấp", example: "非常停止ボタンを押す。" },
+      { jp: "機械", reading: "きかい", vi: "máy móc", example: "機械を止める。" },
+      { jp: "冷蔵庫", reading: "れいぞうこ", vi: "tủ lạnh", example: "冷蔵庫に入れる。" },
+      { jp: "確認", reading: "かくにん", vi: "xác nhận, kiểm tra", example: "温度を確認する。" },
+      { jp: "フライヤー", reading: "ふらいやー", vi: "máy chiên", example: "フライヤーで揚げる。" },
+      { jp: "交換", reading: "こうかん", vi: "thay thế / đổi", example: "油を交換する。" },
+    ]
+  },
+  {
+    num: 8,
+    topic: "đo lường",
+    question: "AVチェッカーはどのようなときに使いますか。",
+    options: ["油の品質をはかる時。", "調味料の品質をはかる時。", "水の品質をはかる時。"],
+    answer: 1,
+    answerNote: "AVチェッカーは油の酸価（AV=Acid Value）をはかる装置。",
+    vocab: [
+      { jp: "AVチェッカー", reading: "えーびーちぇっかー", vi: "thiết bị đo chỉ số axit của dầu (AV Checker)", example: "AVチェッカーで油をはかる。" },
+      { jp: "調味料", reading: "ちょうみりょう", vi: "gia vị", example: "調味料の品質をはかる。" },
+    ]
+  },
+  {
+    num: 9,
+    topic: "vệ sinh",
+    question: "まな板のあつかいについて、ただしいものを一つえらびなさい。",
+    options: ["野菜や肉を切るときはまな板は交換しない", "まな板を洗浄するときお湯をつかう", "野菜や肉を切るときはまな板を交換する"],
+    answer: 3,
+    answerNote: "野菜と肉は異なるまな板を使用し、交差汚染を防ぐ。",
+    vocab: [
+      { jp: "まな板", reading: "まないた", vi: "thớt", example: "まな板を交換する。" },
+      { jp: "あつかい", reading: "あつかい", vi: "cách sử dụng / xử lý", example: "まな板のあつかい。" },
+      { jp: "野菜", reading: "やさい", vi: "rau củ", example: "野菜を切る。" },
+      { jp: "肉", reading: "にく", vi: "thịt", example: "肉を切る。" },
+      { jp: "切る", reading: "きる", vi: "cắt", example: "野菜を切る。" },
+      { jp: "洗浄", reading: "せんじょう", vi: "rửa sạch / làm sạch", example: "まな板を洗浄する。" },
+      { jp: "お湯", reading: "おゆ", vi: "nước nóng", example: "お湯で洗う。" },
+    ]
+  },
+  {
+    num: 10,
+    topic: "máy móc",
+    question: "機械そうじのやり方について、まちがっているものを一つえらびなさい。",
+    options: ["機械を洗うときは、水で流すだけでよい", "機械の取りはずせるところは、はずしてそうじする", "そうじをするときは、機械を止める"],
+    answer: 1,
+    answerNote: "水で流すだけでは不十分。専用洗剤で洗浄・消毒が必要。",
+    vocab: [
+      { jp: "そうじ（掃除）", reading: "そうじ", vi: "dọn dẹp / vệ sinh", example: "機械をそうじする。" },
+      { jp: "やり方", reading: "やりかた", vi: "cách làm / phương pháp", example: "そうじのやり方。" },
+      { jp: "取りはずす", reading: "とりはずす", vi: "tháo ra", example: "部品を取りはずす。" },
+      { jp: "止める", reading: "とめる", vi: "dừng lại / tắt", example: "機械を止める。" },
+    ]
+  },
+  {
+    num: 11,
+    topic: "máy móc",
+    question: "サラダミキサーについて、まちがっているものを一つえらびなさい。",
+    options: ["サラダミキサーは、炒め物を作る機械である。", "サラダミキサーが動いているときは、中に手をいれない", "サラダミキサーを洗うときは、かならず機械を止める"],
+    answer: 1,
+    answerNote: "サラダミキサーはサラダや和え物を混ぜる機械。炒め物を作る機械ではない。",
+    vocab: [
+      { jp: "サラダミキサー", reading: "さらだみきさー", vi: "máy trộn salad", example: "サラダミキサーで混ぜる。" },
+      { jp: "炒め物", reading: "いためもの", vi: "món xào", example: "炒め物を作る。" },
+      { jp: "動いている", reading: "うごいている", vi: "đang hoạt động / đang chạy", example: "機械が動いている。" },
+      { jp: "かならず", reading: "かならず", vi: "nhất định / chắc chắn phải", example: "かならず止めてから洗う。" },
+    ]
+  },
+  {
+    num: 12,
+    topic: "máy móc",
+    question: "機械を洗う時で正しいものを一つえらびなさい",
+    options: ["お湯で洗う", "殺菌剤で洗う", "専用洗剤で洗う"],
+    answer: 3,
+    answerNote: "機械は専用洗剤で洗う。殺菌剤は洗浄後の消毒に使う。",
+    vocab: [
+      { jp: "専用洗剤", reading: "せんようせんざい", vi: "chất tẩy rửa chuyên dụng", example: "専用洗剤で洗う。" },
+      { jp: "洗剤", reading: "せんざい", vi: "chất tẩy rửa / xà phòng", example: "洗剤を使う。" },
+    ]
+  },
+  {
+    num: 13,
+    topic: "quy tắc",
+    question: "作業記録のつけ方について、正しいものを一つえらびなさい",
+    options: ["温度や濃度をはかったら、すぐに記録する。", "後でまとめて記録する。", "いつもと同じ結果を記録する"],
+    answer: 1,
+    answerNote: "測定したらすぐに記録する。後でまとめたり、いつもと同じ結果を書くのは不正。",
+    vocab: [
+      { jp: "作業記録", reading: "さぎょうきろく", vi: "nhật ký công việc / ghi chép tác nghiệp", example: "作業記録をつける。" },
+      { jp: "つけ方", reading: "つけかた", vi: "cách ghi chép", example: "記録のつけ方。" },
+      { jp: "すぐに", reading: "すぐに", vi: "ngay lập tức", example: "すぐに記録する。" },
+      { jp: "記録", reading: "きろく", vi: "ghi chép / ghi lại", example: "温度を記録する。" },
+      { jp: "結果", reading: "けっか", vi: "kết quả", example: "測定の結果。" },
+    ]
+  },
+  {
+    num: 14,
+    topic: "trang phục",
+    question: "工場内で身に着けてよいものを、一つえらびなさい。",
+    options: ["指輪やイヤリング。", "メガネ。", "輪ゴム。"],
+    answer: 2,
+    answerNote: "メガネは許可されている。指輪・イヤリング・輪ゴムは異物混入の原因となる。",
+    vocab: [
+      { jp: "工場内", reading: "こうじょうない", vi: "bên trong nhà máy", example: "工場内に入る。" },
+      { jp: "身に着ける", reading: "みにつける", vi: "đeo / mặc", example: "指輪を身に着ける。" },
+      { jp: "指輪", reading: "ゆびわ", vi: "nhẫn", example: "" },
+      { jp: "イヤリング", reading: "いやりんぐ", vi: "bông tai", example: "" },
+      { jp: "メガネ", reading: "めがね", vi: "kính mắt", example: "" },
+      { jp: "輪ゴム", reading: "わごむ", vi: "dây chun / dây thun", example: "" },
+    ]
+  },
+  {
+    num: 15,
+    topic: "máy móc",
+    question: "スライサーについて、まちがっているものを、一つえらびなさい。",
+    options: ["スライサーは、肉や野菜など食品を切る機械である。", "スライサーを使うときは、手を切らないように注意する。", "スライサーを洗うときは、機械を止めなくてもよい。"],
+    answer: 3,
+    answerNote: "スライサーを洗うときは必ず機械を止める。動いている状態での洗浄は危険。",
+    vocab: [
+      { jp: "スライサー", reading: "すらいさー", vi: "máy thái lát", example: "スライサーで切る。" },
+      { jp: "食品", reading: "しょくひん", vi: "thực phẩm", example: "食品を切る。" },
+      { jp: "手を切らない", reading: "てをきらない", vi: "không bị đứt tay", example: "手を切らないように注意する。" },
+    ]
+  },
+  {
+    num: 16,
+    topic: "trang phục",
+    question: "マスクをつける理由として、まちがっているものを、一つえらびなさい",
+    options: ["口の中の微生物が、食品につかないようにするため。", "鼻の中の微生物が、食品につかないようにするため。", "顔に汚れがつかないようにするため。"],
+    answer: 3,
+    answerNote: "マスクは微生物が食品に入るのを防ぐため。顔の汚れを防ぐためではない。",
+    vocab: [
+      { jp: "マスク", reading: "ますく", vi: "khẩu trang", example: "マスクをつける。" },
+      { jp: "理由", reading: "りゆう", vi: "lý do", example: "マスクをつける理由。" },
+      { jp: "微生物", reading: "びせいぶつ", vi: "vi sinh vật / vi khuẩn", example: "微生物が食品につく。" },
+      { jp: "口", reading: "くち", vi: "miệng", example: "口の中。" },
+      { jp: "鼻", reading: "はな", vi: "mũi", example: "鼻の中。" },
+      { jp: "汚れ", reading: "よごれ", vi: "vết bẩn / sự bẩn", example: "顔に汚れがつく。" },
+    ]
+  },
+  {
+    num: 17,
+    topic: "an toàn",
+    question: "事故を防ぐ方法としてまちがっているものを一つえらびなさい。",
+    options: ["あぶないと思ったので非常停止ボタンを押して機械をとめた。", "冷蔵庫のとびらを閉めるまえに、中に人がいないか確認する。", "油の温度を確認しないでフライヤーの油を交換しようとした。"],
+    answer: 3,
+    answerNote: "油の温度未確認での交換は事故の原因になる。",
+    vocab: [
+      { jp: "あぶない", reading: "あぶない", vi: "nguy hiểm", example: "あぶないので止める。" },
+      { jp: "とびら（扉）", reading: "とびら", vi: "cánh cửa", example: "冷蔵庫のとびら。" },
+      { jp: "閉める", reading: "しめる", vi: "đóng", example: "とびらを閉める。" },
+    ]
+  },
+  {
+    num: 18,
+    topic: "vệ sinh",
+    question: "殺菌した食品のあつかい方で、まちがっているものを一つえらびなさい。",
+    options: ["手袋をつけない手で食品をもつ", "手袋をつけた手で食品をもつ", "消毒した道具を使って食品をもつ"],
+    answer: 1,
+    answerNote: "殺菌した食品は素手で触れてはいけない。手袋や消毒した道具を使う。",
+    vocab: [
+      { jp: "手袋", reading: "てぶくろ", vi: "găng tay", example: "手袋をつける。" },
+      { jp: "消毒", reading: "しょうどく", vi: "khử trùng / tiệt trùng", example: "道具を消毒する。" },
+      { jp: "道具", reading: "どうぐ", vi: "dụng cụ / công cụ", example: "消毒した道具を使う。" },
+    ]
+  },
+  {
+    num: 19,
+    topic: "an toàn",
+    question: "作業場で転ばないために、まちがっているものを一つえらびなさい",
+    options: ["床にこぼれた水や油は、すぐにふきとる", "くつは、うらのみぞが少なくなったものをはく。", "階段をのぼるときは、手すりをつかむ。"],
+    answer: 2,
+    answerNote: "靴裏の溝が少ないと滑りやすい。溝があるものを使用する。",
+    vocab: [
+      { jp: "転ぶ", reading: "ころぶ", vi: "ngã / trượt ngã", example: "転ばないように注意する。" },
+      { jp: "床", reading: "ゆか", vi: "sàn nhà", example: "床にこぼれる。" },
+      { jp: "こぼれる", reading: "こぼれる", vi: "đổ ra / chảy ra", example: "水がこぼれる。" },
+      { jp: "ふきとる", reading: "ふきとる", vi: "lau sạch", example: "水をふきとる。" },
+      { jp: "くつ（靴）", reading: "くつ", vi: "giày", example: "作業靴をはく。" },
+      { jp: "うらのみぞ", reading: "うらのみぞ", vi: "rãnh đế giày", example: "みぞが少ない靴。" },
+      { jp: "階段", reading: "かいだん", vi: "cầu thang", example: "階段をのぼる。" },
+      { jp: "手すり", reading: "てすり", vi: "tay vịn cầu thang", example: "手すりをつかむ。" },
+    ]
+  },
+  {
+    num: 20,
+    topic: "vệ sinh",
+    question: "サラダや和え物を作るときの注意点として、正しいものを一つえらびなさい。",
+    options: ["器具を消毒すれば、材料は消毒しなくてよい", "作業するときは消毒した器具を使う", "出来上がったら温度が下がらないところで保管する"],
+    answer: 2,
+    answerNote: "消毒した器具を使うのが正しい。材料も消毒が必要。できたら冷蔵保管。",
+    vocab: [
+      { jp: "和え物", reading: "あえもの", vi: "món trộn kiểu Nhật", example: "和え物を作る。" },
+      { jp: "器具", reading: "きぐ", vi: "dụng cụ", example: "器具を消毒する。" },
+      { jp: "材料", reading: "ざいりょう", vi: "nguyên liệu", example: "材料を準備する。" },
+      { jp: "出来上がる", reading: "できあがる", vi: "hoàn thành / làm xong", example: "料理が出来上がる。" },
+    ]
+  },
+  {
+    num: 21,
+    topic: "vệ sinh",
+    question: "まな板のあつかいについて、まちがっているものを一つえらびなさい。",
+    options: ["肉や野菜を切るときは、専用のまな板を使う", "まな板を使ったら、必ず洗浄して消毒する。", "まな板をお湯で消毒するときは、ぬるいお湯で行う。"],
+    answer: 3,
+    answerNote: "まな板の消毒には熱いお湯（83℃以上）を使う必要がある。ぬるいお湯では不十分。",
+    vocab: [
+      { jp: "専用", reading: "せんよう", vi: "chuyên dụng / dành riêng cho", example: "専用のまな板を使う。" },
+      { jp: "ぬるいお湯", reading: "ぬるいおゆ", vi: "nước ấm (không đủ nóng)", example: "ぬるいお湯では消毒できない。" },
+    ]
+  },
+  {
+    num: 22,
+    topic: "vệ sinh",
+    question: "健康チェックについて、まちがっているものを一つえらびなさい。",
+    options: ["おなかがいたかったが、休みたくないので報告しなかった", "指にけがをしていたので報告", "熱が38℃あったので、会社に行く前に上司に報告した。"],
+    answer: 1,
+    answerNote: "体調不良は必ず報告しなければならない。報告しないのは規則違反。",
+    vocab: [
+      { jp: "健康チェック", reading: "けんこうちぇっく", vi: "kiểm tra sức khỏe", example: "毎日健康チェックをする。" },
+      { jp: "おなかがいたい", reading: "おなかがいたい", vi: "đau bụng", example: "おなかがいたかった。" },
+      { jp: "報告", reading: "ほうこく", vi: "báo cáo", example: "上司に報告する。" },
+      { jp: "けが（怪我）", reading: "けが", vi: "vết thương / bị thương", example: "指にけがをする。" },
+      { jp: "熱", reading: "ねつ", vi: "sốt / nhiệt độ cơ thể", example: "熱が38℃ある。" },
+      { jp: "上司", reading: "じょうし", vi: "cấp trên / quản lý", example: "上司に報告する。" },
+    ]
+  },
+  {
+    num: 23,
+    topic: "vệ sinh",
+    question: "和える作業の注意点として、正しいものを一つえらびなさい。",
+    options: ["和えるときは、均一になるように混ぜる。", "和える前は機械を消毒しなくてもよい。", "和えたサラダに触れるときに、手は消毒しなくてよい。"],
+    answer: 1,
+    answerNote: "和え物は均一に混ぜることが重要。機械・手の消毒も必要。",
+    vocab: [
+      { jp: "和える", reading: "あえる", vi: "trộn (theo kiểu Nhật)", example: "サラダを和える。" },
+      { jp: "均一", reading: "きんいつ", vi: "đồng đều / đều nhau", example: "均一になるように混ぜる。" },
+      { jp: "混ぜる", reading: "まぜる", vi: "trộn / khuấy", example: "材料を混ぜる。" },
+      { jp: "触れる", reading: "ふれる", vi: "chạm vào", example: "食品に触れる。" },
+    ]
+  },
+  {
+    num: 24,
+    topic: "vệ sinh",
+    question: "酢の物を作るときの注意点として、まちがったものを一つえらびなさい。",
+    options: ["手袋を消毒すれば器具は消毒しなくてもよい", "調味料が水でうすくならないようにする。", "出来上がったらすぐに冷蔵庫に保管する。"],
+    answer: 1,
+    answerNote: "手袋だけでなく器具も消毒が必要。",
+    vocab: [
+      { jp: "酢の物", reading: "すのもの", vi: "món giấm / món ngâm dấm", example: "酢の物を作る。" },
+      { jp: "うすくなる", reading: "うすくなる", vi: "trở nên loãng hơn", example: "水でうすくなる。" },
+    ]
+  },
+  {
+    num: 25,
+    topic: "máy móc",
+    question: "フライヤーについて、まちがっているものを一つえらびなさい。",
+    options: ["フライヤーは、食品を油で揚げる機械である。", "フライヤーは、食品を焼く機械である。", "フライヤーを使うときは、やけどに注意する。"],
+    answer: 2,
+    answerNote: "フライヤーは食品を油で揚げる機械。焼く機械ではない。",
+    vocab: [
+      { jp: "揚げる", reading: "あげる", vi: "chiên (trong dầu)", example: "油で揚げる。" },
+      { jp: "焼く", reading: "やく", vi: "nướng / rang", example: "食品を焼く。" },
+      { jp: "やけど（火傷）", reading: "やけど", vi: "bỏng", example: "やけどに注意する。" },
+    ]
+  },
+  {
+    num: 26,
+    topic: "nấu ăn",
+    question: "蒸す機械はどんな機械ですか正しいものを一つえらびなさい",
+    options: ["水を使い蒸す機械。", "水蒸気を使い蒸す機械。", "お湯を使い蒸す機械。"],
+    answer: 2,
+    answerNote: "蒸し機械は水蒸気（スチーム）を使って蒸す。",
+    vocab: [
+      { jp: "蒸す", reading: "むす", vi: "hấp", example: "食品を蒸す。" },
+      { jp: "水蒸気", reading: "すいじょうき", vi: "hơi nước", example: "水蒸気で蒸す。" },
+    ]
+  },
+  {
+    num: 27,
+    topic: "quy tắc",
+    question: "工場内での5Sで正しいものを一つえらびなさい",
+    options: ["整理・整頓・清掃・清潔・習慣", "整理・整頓・清掃・清潔・切磋。", "整理・整頓・清掃・清潔・洗濯。"],
+    answer: 1,
+    answerNote: "5Sは「整理・整頓・清掃・清潔・習慣（躾）」の5つ。",
+    vocab: [
+      { jp: "5S（ごえす）", reading: "ごえす", vi: "5S (phương pháp quản lý nhà máy của Nhật)", example: "5Sを実践する。" },
+      { jp: "整理", reading: "せいり", vi: "sắp xếp / phân loại (Sort)", example: "不要なものを整理する。" },
+      { jp: "整頓", reading: "せいとん", vi: "ngăn nắp / sắp đặt gọn gàng (Set in order)", example: "道具を整頓する。" },
+      { jp: "清掃", reading: "せいそう", vi: "vệ sinh / quét dọn (Shine)", example: "床を清掃する。" },
+      { jp: "清潔", reading: "せいけつ", vi: "sạch sẽ (Standardize)", example: "清潔を保つ。" },
+      { jp: "習慣（躾）", reading: "しゅうかん（しつけ）", vi: "thói quen / kỷ luật (Sustain)", example: "習慣を身につける。" },
+    ]
+  },
+  {
+    num: 28,
+    topic: "vệ sinh",
+    question: "お腹が痛いときどうしますか まちがっているものを一つえらびなさい。",
+    options: ["報告しないで、そのまま休んだ。", "報告してから、病院へ行った。", "報告してから休んだ。"],
+    answer: 1,
+    answerNote: "必ず上司に報告してから休む。報告なしに休むのは不可。",
+    vocab: [
+      { jp: "お腹が痛い", reading: "おなかがいたい", vi: "đau bụng", example: "お腹が痛いときは報告する。" },
+      { jp: "病院", reading: "びょういん", vi: "bệnh viện", example: "病院へ行く。" },
+    ]
+  },
+  {
+    num: 29,
+    topic: "khử trùng",
+    question: "殺菌剤を使って調理器具を消毒する方法として、ただしいものを一つえらびなさい。",
+    options: ["調理器具を洗う前に消毒する。", "消毒する前に調理器具に水をつける。", "調理器具を洗って乾かしてから消毒する。"],
+    answer: 3,
+    answerNote: "正しい手順：洗浄→乾燥→消毒。水分が残っていると殺菌剤が薄まり効果が落ちる。",
+    vocab: [
+      { jp: "調理器具", reading: "ちょうりきぐ", vi: "dụng cụ nấu ăn", example: "調理器具を洗う。" },
+      { jp: "乾かす", reading: "かわかす", vi: "làm khô / phơi khô", example: "器具を乾かす。" },
+      { jp: "手順", reading: "てじゅん", vi: "trình tự / quy trình", example: "正しい手順で行う。" },
+    ]
+  },
+  {
+    num: 30,
+    topic: "quy tắc",
+    question: "計量をするときどうしたらいいか正しいものを一つえらびなさい。",
+    options: ["まとめて記入", "記入しない", "毎回記入"],
+    answer: 3,
+    answerNote: "計量のたびに毎回記録する。後でまとめて書いたり書かないのは不正。",
+    vocab: [
+      { jp: "計量", reading: "けいりょう", vi: "đo lường / cân đong", example: "計量をする。" },
+      { jp: "記入", reading: "きにゅう", vi: "ghi vào / điền vào", example: "毎回記入する。" },
+      { jp: "毎回", reading: "まいかい", vi: "mỗi lần", example: "毎回記入する。" },
+    ]
+  },
+  {
+    num: 31,
+    topic: "nấu ăn",
+    question: "基準値の注意点でまちがっているものを一つえらびなさい。",
+    options: ["コロッケを揚げるときの油の温度は150℃を基準値とする。", "基準値は高かったり低かった場合は報告する。", "製造作業は一定の基準値がある。"],
+    answer: 1,
+    answerNote: "コロッケの揚げ温度は通常170～180℃程度。150℃は低すぎる。",
+    vocab: [
+      { jp: "基準値", reading: "きじゅんち", vi: "giá trị chuẩn / tiêu chuẩn", example: "基準値を守る。" },
+      { jp: "コロッケ", reading: "ころっけ", vi: "croquette (món chiên)", example: "コロッケを揚げる。" },
+      { jp: "製造作業", reading: "せいぞうさぎょう", vi: "công việc sản xuất", example: "製造作業の基準値。" },
+      { jp: "一定", reading: "いってい", vi: "nhất định / ổn định", example: "一定の基準値がある。" },
+    ]
+  },
+  {
+    num: 32,
+    topic: "ngộ độc",
+    question: "食中毒について正しいものを一つえらびなさい。",
+    options: ["寄生虫によって食中毒になる。", "消費期限中に食べ食中毒になる", "解凍し加熱して食中毒になる"],
+    answer: 1,
+    answerNote: "寄生虫（アニサキスなど）も食中毒の原因になる。",
+    vocab: [
+      { jp: "食中毒", reading: "しょくちゅうどく", vi: "ngộ độc thực phẩm", example: "食中毒を防ぐ。" },
+      { jp: "寄生虫", reading: "きせいちゅう", vi: "ký sinh trùng", example: "寄生虫による食中毒。" },
+      { jp: "消費期限", reading: "しょうひきげん", vi: "hạn sử dụng", example: "消費期限内に食べる。" },
+      { jp: "解凍", reading: "かいとう", vi: "rã đông", example: "冷凍品を解凍する。" },
+      { jp: "加熱", reading: "かねつ", vi: "đun nóng / gia nhiệt", example: "加熱して食べる。" },
+    ]
+  },
+  {
+    num: 33,
+    topic: "bảo quản",
+    question: "食材の保管について正しいものを一つえらびなさい。",
+    options: ["肉・魚は冷蔵庫で保管する。", "肉・魚はそのままで保管する。", "肉・魚は冷凍庫で保管する。"],
+    answer: 1,
+    answerNote: "肉・魚は冷蔵庫で適切に保管する（すぐに使わない場合は冷凍）。",
+    vocab: [
+      { jp: "魚", reading: "さかな", vi: "cá", example: "魚を保管する。" },
+      { jp: "冷凍庫", reading: "れいとうこ", vi: "ngăn đông / tủ đông", example: "冷凍庫で保管する。" },
+    ]
+  },
+  {
+    num: 34,
+    topic: "vệ sinh",
+    question: "器具を洗うときに使うものについて、正しいものを一つえらびなさい。",
+    options: ["殺菌剤を使ってあらう。", "アルコールを使って洗う。", "洗浄剤を使って洗う。"],
+    answer: 3,
+    answerNote: "器具を洗うには洗浄剤を使う。殺菌剤・アルコールは消毒用。",
+    vocab: [
+      { jp: "洗浄剤", reading: "せんじょうざい", vi: "chất tẩy rửa / dung dịch rửa", example: "洗浄剤で洗う。" },
+      { jp: "アルコール", reading: "あるこーる", vi: "cồn / alcohol", example: "アルコールで消毒する。" },
+    ]
+  },
+  {
+    num: 35,
+    topic: "khử trùng",
+    question: "殺菌剤の扱い方法として、まちがっているものを一つえらびなさい。",
+    options: ["殺菌剤は、どこで保管してもよい。", "殺菌剤を容器に移すときは、必ず移した容器に「殺菌剤」と表示する。", "目に入らないようにする。"],
+    answer: 1,
+    answerNote: "殺菌剤は決められた場所に保管しなければならない。",
+    vocab: [
+      { jp: "容器", reading: "ようき", vi: "hộp đựng / bình chứa", example: "容器に移す。" },
+      { jp: "移す", reading: "うつす", vi: "chuyển / rót sang", example: "別の容器に移す。" },
+      { jp: "表示", reading: "ひょうじ", vi: "nhãn / ghi chú", example: "容器に表示する。" },
+      { jp: "目に入らない", reading: "めにはいらない", vi: "không để vào mắt", example: "目に入らないようにする。" },
+    ]
+  },
+  {
+    num: 36,
+    topic: "ngộ độc",
+    question: "食中毒防止のポイントとしてまちがっているものを一つえらびなさい。",
+    options: ["ルール・基準を守る", "決められた加熱時間", "食材を出したまま"],
+    answer: 3,
+    answerNote: "食材を常温に出したままにするのは食中毒のリスクがある。",
+    vocab: [
+      { jp: "防止", reading: "ぼうし", vi: "phòng ngừa / ngăn chặn", example: "食中毒を防止する。" },
+      { jp: "ルール", reading: "るーる", vi: "quy tắc / nội quy", example: "ルールを守る。" },
+      { jp: "基準", reading: "きじゅん", vi: "tiêu chuẩn", example: "基準を守る。" },
+      { jp: "出したまま", reading: "だしたまま", vi: "để ra bên ngoài không cất vào", example: "食材を出したまま。" },
+    ]
+  },
+  {
+    num: 37,
+    topic: "máy móc",
+    question: "スライサーはどんな機械ですか正しいものを一つえらびなさい。",
+    options: ["炒め物をする機械。", "肉や野菜などの食品を切る機械。", "野菜の皮をむく機械。"],
+    answer: 2,
+    answerNote: "スライサーは食品を薄く切る機械。",
+    vocab: [
+      { jp: "皮をむく", reading: "かわをむく", vi: "gọt vỏ", example: "野菜の皮をむく。" },
+    ]
+  },
+  {
+    num: 38,
+    topic: "trang phục",
+    question: "作業服にてきした番号をえらびなさい。",
+    options: ["半そで と ズボン。", "半そで と 長ズボン。", "長そで と 長ズボン。"],
+    answer: 3,
+    answerNote: "作業服は長袖・長ズボンが基本。肌の露出を最小限にする。",
+    vocab: [
+      { jp: "作業服", reading: "さぎょうふく", vi: "đồng phục lao động", example: "作業服を着る。" },
+      { jp: "半そで", reading: "はんそで", vi: "áo tay ngắn", example: "" },
+      { jp: "長そで", reading: "ながそで", vi: "áo tay dài", example: "" },
+      { jp: "ズボン", reading: "ずぼん", vi: "quần ngắn", example: "" },
+      { jp: "長ズボン", reading: "ながずぼん", vi: "quần dài", example: "" },
+    ]
+  },
+  {
+    num: 39,
+    topic: "an toàn",
+    question: "包丁の使い方のポイントとしてまちがっているものを一つえらびなさい。",
+    options: ["周りを確認した。", "刃が欠けていないか確認した。", "確認せずそのまま使った。"],
+    answer: 3,
+    answerNote: "包丁は使う前に周囲の確認と刃の状態確認が必要。",
+    vocab: [
+      { jp: "包丁", reading: "ほうちょう", vi: "dao bếp", example: "包丁を使う。" },
+      { jp: "周り", reading: "まわり", vi: "xung quanh", example: "周りを確認する。" },
+      { jp: "刃", reading: "は", vi: "lưỡi dao", example: "刃が欠けている。" },
+      { jp: "欠ける", reading: "かける", vi: "bị mẻ / bị sứt", example: "刃が欠けている。" },
+    ]
+  },
+  {
+    num: 40,
+    topic: "bảo quản",
+    question: "保管するときの注意点でまちがっているものを一つえらびなさい。",
+    options: ["魚・肉・野菜は冷蔵庫を分ける。", "肉・魚はそのまま保管する。", "加熱調理した惣菜は30分以内に冷蔵庫へ保管。"],
+    answer: 2,
+    answerNote: "肉・魚はそのままではなく適切な容器に入れて保管する。",
+    vocab: [
+      { jp: "分ける", reading: "わける", vi: "phân chia / chia riêng", example: "冷蔵庫を分ける。" },
+      { jp: "加熱調理", reading: "かねつちょうり", vi: "nấu chín bằng nhiệt", example: "加熱調理した惣菜。" },
+      { jp: "惣菜", reading: "そうざい", vi: "thức ăn chế biến sẵn / món ăn làm sẵn", example: "惣菜を保管する。" },
+      { jp: "以内", reading: "いない", vi: "trong vòng / không quá", example: "30分以内に。" },
+    ]
+  },
+  {
+    num: 41,
+    topic: "trang phục",
+    question: "どうして外で作業靴をはかないのか、正しいものを一つえらびなさい。",
+    options: ["工場内に細菌や異物などを入れないため。", "工場の規則だから。", "作業靴がよごれるため。"],
+    answer: 1,
+    answerNote: "作業靴を外で履かない理由は、細菌・異物を工場内に持ち込まないため。",
+    vocab: [
+      { jp: "作業靴", reading: "さぎょうぐつ", vi: "giày làm việc / giày bảo hộ", example: "作業靴をはく。" },
+      { jp: "細菌", reading: "さいきん", vi: "vi khuẩn", example: "細菌が入る。" },
+      { jp: "異物", reading: "いぶつ", vi: "dị vật / vật lạ", example: "異物が混入する。" },
+      { jp: "規則", reading: "きそく", vi: "quy định / nội quy", example: "工場の規則を守る。" },
+    ]
+  },
+  {
+    num: 42,
+    topic: "trang phục",
+    question: "作業着や工場内の靴で外へ出てはいけない理由のうちまちがっているものを一つえらびなさい。",
+    options: ["外のほこりや汚れを作業着や靴につけないため。", "外の微生物を工場内に持ち込ませないため。", "工場内の汚れや微生物を外に持ち出すため。"],
+    answer: 3,
+    answerNote: "「外に持ち出すため」というのは理由にならない。外に汚れを持ち出さないためが正解。",
+    vocab: [
+      { jp: "ほこり（埃）", reading: "ほこり", vi: "bụi bẩn", example: "ほこりがつく。" },
+      { jp: "持ち込む", reading: "もちこむ", vi: "mang vào", example: "細菌を工場内に持ち込む。" },
+      { jp: "持ち出す", reading: "もちだす", vi: "mang ra ngoài", example: "微生物を外に持ち出す。" },
+    ]
+  },
+  {
+    num: 43,
+    topic: "trang phục",
+    question: "手袋をつける理由として、正しいものを一つえらびなさい。",
+    options: ["手の表面にいる微生物が、商品につかないようにするため。", "手が汚れないようにするため。", "手が冷たくならないようにするため。"],
+    answer: 1,
+    answerNote: "手袋は手の微生物が商品に付かないようにするため。",
+    vocab: [
+      { jp: "表面", reading: "ひょうめん", vi: "bề mặt", example: "手の表面にいる微生物。" },
+      { jp: "商品", reading: "しょうひん", vi: "sản phẩm / hàng hóa", example: "商品に微生物がつく。" },
+    ]
+  },
+  {
+    num: 44,
+    topic: "quy tắc",
+    question: "作業で使用した器具の片付けについて、まちがったものを一つえらびなさい。",
+    options: ["使った器具は元の場所に戻す。", "誰かが使うと思ったので、そのまま作業場に置く。", "次に使う人がいたらその人に渡す。"],
+    answer: 2,
+    answerNote: "使った器具はそのままにせず、必ず元の場所に戻す。",
+    vocab: [
+      { jp: "片付け", reading: "かたづけ", vi: "dọn dẹp / thu dọn", example: "器具の片付けをする。" },
+      { jp: "元の場所", reading: "もとのばしょ", vi: "chỗ cũ / vị trí ban đầu", example: "元の場所に戻す。" },
+      { jp: "戻す", reading: "もどす", vi: "trả lại / để lại chỗ cũ", example: "器具を元の場所に戻す。" },
+      { jp: "渡す", reading: "わたす", vi: "đưa cho / chuyển cho", example: "次の人に渡す。" },
+    ]
+  },
+  {
+    num: 45,
+    topic: "nấu ăn",
+    question: "揚げる作業の注意点について、まちがっているものを一つえらびなさい。",
+    options: ["揚げるときの温度は、高いほどよい。", "古くなった油は、使ってはいけない。", "揚げるときは、温度と時間が重要である。"],
+    answer: 1,
+    answerNote: "揚げ温度は高すぎると焦げたり品質が落ちる。適切な温度管理が必要。",
+    vocab: [
+      { jp: "古くなった油", reading: "ふるくなったあぶら", vi: "dầu đã cũ / dầu đã hỏng", example: "古くなった油は使わない。" },
+      { jp: "重要", reading: "じゅうよう", vi: "quan trọng", example: "温度と時間が重要。" },
+    ]
+  },
+  {
+    num: 46,
+    topic: "nấu ăn",
+    question: "下処理の作業の注意点についてまちがっているものを一つえらびなさい。",
+    options: ["野菜の皮をむく。", "魚の骨を除く。", "フライヤーで揚げる。"],
+    answer: 3,
+    answerNote: "フライヤーで揚げるのは下処理ではなく加熱調理。",
+    vocab: [
+      { jp: "下処理", reading: "したしょり", vi: "sơ chế / chuẩn bị nguyên liệu", example: "下処理をする。" },
+      { jp: "骨", reading: "ほね", vi: "xương", example: "魚の骨を除く。" },
+      { jp: "除く", reading: "のぞく", vi: "loại bỏ / bỏ ra", example: "骨を除く。" },
+    ]
+  },
+  {
+    num: 47,
+    topic: "máy móc",
+    question: "スライサーを使用するときの注意点でまちがっているものを一つえらびなさい。",
+    options: ["安全カバーがついているか確認した。", "刃が欠けていたがそのまま使った。", "使用するとき怪我をしないようにする。"],
+    answer: 2,
+    answerNote: "刃が欠けている場合は使用してはいけない。必ず報告・交換する。",
+    vocab: [
+      { jp: "安全カバー", reading: "あんぜんかばー", vi: "tấm che an toàn", example: "安全カバーを確認する。" },
+      { jp: "怪我", reading: "けが", vi: "vết thương / bị thương", example: "怪我をしないようにする。" },
+    ]
+  },
+  {
+    num: 48,
+    topic: "nấu ăn",
+    question: "焼く作業の注意点についてまちがっているものを一つえらびなさい。",
+    options: ["焼いた物は表面温度をはかる。", "火を使うのでやけどに注意する。", "時間と温度が重要である。"],
+    answer: 1,
+    answerNote: "焼いた物は表面温度でなく中心温度をはかって確認する。",
+    vocab: [
+      { jp: "焼いた物", reading: "やいたもの", vi: "món đã nướng", example: "焼いた物の温度をはかる。" },
+      { jp: "中心温度", reading: "ちゅうしんおんど", vi: "nhiệt độ trung tâm", example: "中心温度をはかる。" },
+      { jp: "火", reading: "ひ", vi: "lửa", example: "火を使う。" },
+    ]
+  },
+  {
+    num: 49,
+    topic: "an toàn",
+    question: "けがをした時はどうするのか正しいものを一つえらびなさい。",
+    options: ["何も言わずにがまんした。", "ばれないように隠した。", "近くにいる上司に報告した。"],
+    answer: 3,
+    answerNote: "けがは必ず近くの上司に報告する。",
+    vocab: [
+      { jp: "がまんする", reading: "がまんする", vi: "chịu đựng / nhẫn nại", example: "痛みをがまんする。" },
+      { jp: "隠す", reading: "かくす", vi: "giấu / che giấu", example: "けがを隠す。" },
+      { jp: "近くにいる", reading: "ちかくにいる", vi: "đang ở gần đó", example: "近くにいる上司。" },
+    ]
+  },
+  {
+    num: 50,
+    topic: "trang phục",
+    question: "マスクをかける事で正しいものを一つえらびなさい。",
+    options: ["自分が誰なのかを、わからないようにするため。", "鼻の中の微生物が、食品に入らないようにするため。", "顔に汚れが付かないようにするため。"],
+    answer: 2,
+    answerNote: "マスクは鼻・口の微生物が食品に入らないようにするため。",
+    vocab: []
+  },
+  {
+    num: 51,
+    topic: "vệ sinh",
+    question: "爪を短く切るのはなぜか正しいものを一つえらびなさい。",
+    options: ["雑菌の侵入を防ぐため。", "手ぶくろが破れないため。", "手ぶくろが破れても雑菌の侵入を防ぐため。"],
+    answer: 3,
+    answerNote: "爪を短く切ると、万が一手袋が破れても雑菌の侵入を最小化できる。",
+    vocab: [
+      { jp: "爪", reading: "つめ", vi: "móng tay", example: "爪を短く切る。" },
+      { jp: "短く", reading: "みじかく", vi: "ngắn", example: "爪を短く切る。" },
+      { jp: "雑菌", reading: "ざっきん", vi: "tạp khuẩn / vi khuẩn tạp", example: "雑菌の侵入を防ぐ。" },
+      { jp: "侵入", reading: "しんにゅう", vi: "xâm nhập", example: "雑菌が侵入する。" },
+      { jp: "破れる", reading: "やぶれる", vi: "bị rách / bị thủng", example: "手袋が破れる。" },
+    ]
+  },
+  {
+    num: 52,
+    topic: "vệ sinh",
+    question: "健康チェックでまちがっているものを一つえらびなさい。",
+    options: ["熱が38℃あったが出勤して仕事した。", "健康チェックしないと工場内に入れない。", "健康チェックは毎日出勤したときに行う。"],
+    answer: 1,
+    answerNote: "38℃の熱がある場合は出勤してはいけない。",
+    vocab: [
+      { jp: "出勤", reading: "しゅっきん", vi: "đi làm / đến nơi làm việc", example: "出勤する。" },
+    ]
+  },
+  {
+    num: 53,
+    topic: "nấu ăn",
+    question: "煮る作業の注意点について、正しいものを一つえらびなさい。",
+    options: ["煮るときの温度は、高いほどよい。", "煮るときは、温度と時間が重要である。", "煮るときの時間は、長いほどよい。"],
+    answer: 2,
+    answerNote: "煮る作業は温度と時間の両方を適切に管理することが重要。",
+    vocab: [
+      { jp: "煮る", reading: "にる", vi: "kho / nấu (đun sôi)", example: "食材を煮る。" },
+    ]
+  },
+  {
+    num: 54,
+    topic: "an toàn",
+    question: "異物を見たらどうしますか。",
+    options: ["捨てて、報告しない。", "指摘して、報告する。", "見せて報告する。"],
+    answer: 3,
+    answerNote: "異物は実物を保管して上司に見せて報告する。捨てると証拠がなくなる。",
+    vocab: [
+      { jp: "異物", reading: "いぶつ", vi: "dị vật / vật lạ lẫn vào", example: "異物を発見した。" },
+      { jp: "捨てる", reading: "すてる", vi: "vứt đi / bỏ đi", example: "異物を捨てる。" },
+      { jp: "指摘", reading: "してき", vi: "chỉ ra / nêu ra", example: "問題を指摘する。" },
+    ]
+  },
+  {
+    num: 55,
+    topic: "vệ sinh",
+    question: "仕事中に体調が悪くなったときの行動として、正しいものを一つえらびなさい。",
+    options: ["がまんできなかったので、だれにも報告せず。", "すぐに上司に報告した。", "上司に報告せずトイレに行った。"],
+    answer: 2,
+    answerNote: "体調が悪くなったらすぐに上司に報告する。",
+    vocab: [
+      { jp: "体調が悪い", reading: "たいちょうがわるい", vi: "cảm thấy không khỏe / sức khỏe kém", example: "体調が悪い。" },
+      { jp: "行動", reading: "こうどう", vi: "hành động", example: "正しい行動をとる。" },
+    ]
+  },
+  {
+    num: 56,
+    topic: "vệ sinh",
+    question: "手洗いについて、まちがっているものを一つえらびなさい。",
+    options: ["手についた汚れや微生物をとるためにおこなう。", "爪の中は洗わなくてもよい。", "指のあいだや手首までしっかり洗う。"],
+    answer: 2,
+    answerNote: "爪の中も含めてしっかり洗う必要がある。",
+    vocab: [
+      { jp: "手洗い", reading: "てあらい", vi: "rửa tay", example: "手洗いをする。" },
+      { jp: "爪の中", reading: "つめのなか", vi: "bên trong móng tay", example: "爪の中も洗う。" },
+      { jp: "指のあいだ", reading: "ゆびのあいだ", vi: "kẽ ngón tay", example: "指のあいだをしっかり洗う。" },
+      { jp: "手首", reading: "てくび", vi: "cổ tay", example: "手首まで洗う。" },
+    ]
+  },
+  {
+    num: 57,
+    topic: "nấu ăn",
+    question: "めんを茹でる作業の注意点について、まちがっているものを一つえらびなさい。",
+    options: ["めんを茹でるときは、温度と時間が重要である。", "めんを茹でるときは、良くかきまぜる。", "めんを茹でるときの温度は、低いほうが良い。"],
+    answer: 3,
+    answerNote: "めんを茹でるときは沸騰したお湯（高温）で茹でる。低温では不十分。",
+    vocab: [
+      { jp: "めん（麺）", reading: "めん", vi: "mì / bún", example: "めんを茹でる。" },
+      { jp: "茹でる", reading: "ゆでる", vi: "luộc", example: "めんを茹でる。" },
+      { jp: "かきまぜる", reading: "かきまぜる", vi: "khuấy đều", example: "よくかきまぜる。" },
+    ]
+  },
+  {
+    num: 58,
+    topic: "đo lường",
+    question: "クロール紙はどのようなときに使いますか。",
+    options: ["調味料の濃度をはかるとき。", "殺菌剤の濃度をはかるとき。", "洗剤の濃度をはかるとき。"],
+    answer: 2,
+    answerNote: "クロール紙（塩素チェックペーパー）は殺菌剤（塩素系）の濃度をはかるために使う。",
+    vocab: [
+      { jp: "クロール紙", reading: "くろーるし", vi: "giấy kiểm tra clo / chlorine test strip", example: "クロール紙で濃度をはかる。" },
+    ]
+  },
+  {
+    num: 59,
+    topic: "khử trùng",
+    question: "殺菌剤の扱いについて正しいものを一つえらびなさい。",
+    options: ["確認してから使う。", "濃いほどよい。", "薄いほどよい。"],
+    answer: 1,
+    answerNote: "殺菌剤は濃度・時間・温度を確認してから使う。濃すぎても薄すぎても問題がある。",
+    vocab: []
+  },
+  {
+    num: 60,
+    topic: "vệ sinh",
+    question: "なぜ毎日健康チェックをするのか正しいものを一つえらびなさい。",
+    options: ["病気・下痢・熱がないか確認するため。", "毎日ごはんをたべるため。", "ストレスがないか確認するため。"],
+    answer: 1,
+    answerNote: "健康チェックは病気・下痢・発熱がないかを確認するためのもの。",
+    vocab: [
+      { jp: "下痢", reading: "げり", vi: "tiêu chảy", example: "下痢がある。" },
+      { jp: "ストレス", reading: "すとれす", vi: "căng thẳng / stress", example: "" },
+    ]
+  },
+  {
+    num: 61,
+    topic: "vệ sinh",
+    question: "体調が良くない時は誰に報告するのか正しいものを一つえらびなさい。",
+    options: ["社員", "パート", "上司"],
+    answer: 3,
+    answerNote: "体調不良は上司に報告する。",
+    vocab: [
+      { jp: "社員", reading: "しゃいん", vi: "nhân viên chính thức", example: "" },
+      { jp: "パート", reading: "ぱーと", vi: "nhân viên bán thời gian (part-time)", example: "" },
+    ]
+  },
+  {
+    num: 62,
+    topic: "khử trùng",
+    question: "殺菌剤の扱いについてまちがっているものを一つえらびなさい。",
+    options: ["時間と濃度を確認してから使う。", "時間や濃度を確認してから使う。", "時間と濃度をてきとうに確認してから使う。"],
+    answer: 3,
+    answerNote: "「てきとうに」（適当に＝いい加減に）確認するのは間違い。正確に確認しなければならない。",
+    vocab: [
+      { jp: "てきとうに（適当に）", reading: "てきとうに", vi: "một cách tùy tiện / qua loa", example: "てきとうに確認する。（間違い）" },
+    ]
+  },
+  {
+    num: 63,
+    topic: "máy móc",
+    question: "機械の洗浄について、正しいものを一つえらびなさい。",
+    options: ["他の商品に臭いをうつさないため。", "機械が汚れているため。", "汚れと他の商品に臭いをうつさないため。"],
+    answer: 3,
+    answerNote: "機械を洗浄する理由は汚れを落とすことと、他の商品への臭い移りを防ぐための両方。",
+    vocab: [
+      { jp: "臭い", reading: "におい", vi: "mùi", example: "臭いがうつる。" },
+      { jp: "うつる", reading: "うつる", vi: "lây / truyền sang", example: "他の商品に臭いがうつる。" },
+    ]
+  },
+  {
+    num: 64,
+    topic: "nấu ăn",
+    question: "非加熱調理のポイントとしてまちがっているものを一つえらびなさい。",
+    options: ["酢の物を作る。", "炒め物を作る。", "和え物を作る。"],
+    answer: 2,
+    answerNote: "炒め物は加熱調理。非加熱調理は酢の物・和え物など。",
+    vocab: [
+      { jp: "非加熱調理", reading: "ひかねつちょうり", vi: "chế biến không qua nhiệt / không nấu chín", example: "非加熱調理の注意点。" },
+    ]
+  },
+  {
+    num: 65,
+    topic: "ngộ độc",
+    question: "アレルギー物質の代表的な食べ物はなんですか。",
+    options: [
+      "エビ、カニ、卵、小麦、そば、乳、落花生。",
+      "エビ、カニ、卵、小麦、そば、お湯、落花生。",
+      "エビ、カニ、卵、水、そば、乳、落花生。"
+    ],
+    answer: 1,
+    answerNote: "7大アレルゲン：エビ・カニ・卵・小麦・そば・乳・落花生。",
+    vocab: [
+      { jp: "アレルギー物質", reading: "あれるぎーぶっしつ", vi: "chất gây dị ứng / allergen", example: "アレルギー物質を確認する。" },
+      { jp: "エビ", reading: "えび", vi: "tôm", example: "" },
+      { jp: "カニ", reading: "かに", vi: "cua", example: "" },
+      { jp: "卵", reading: "たまご", vi: "trứng", example: "" },
+      { jp: "そば", reading: "そば", vi: "kiều mạch / mì soba", example: "" },
+      { jp: "乳", reading: "にゅう", vi: "sữa", example: "" },
+      { jp: "落花生", reading: "らっかせい", vi: "lạc / đậu phộng", example: "" },
+    ]
+  },
+  {
+    num: 66,
+    topic: "vệ sinh",
+    question: "まな板で魚や肉を切った後、洗う時の正しいものを一つえらびなさい。",
+    options: ["お湯で洗った。", "何もつけないで洗った。", "洗剤で洗った。"],
+    answer: 3,
+    answerNote: "まな板は洗剤で洗って汚れを落とし、その後消毒する。",
+    vocab: []
+  },
+  {
+    num: 67,
+    topic: "khử trùng",
+    question: "殺菌剤の使い方で正しいものを一つえらびなさい。",
+    options: ["濃度と時間と温度が大切。", "濃度が濃く時間が大切。", "決められた濃度と時間が大切。"],
+    answer: 3,
+    answerNote: "殺菌剤は決められた濃度と時間を守ることが最も重要。",
+    vocab: []
+  },
+  {
+    num: 68,
+    topic: "đo lường",
+    question: "リトマス紙の使い方で正しいものを一つえらびなさい。",
+    options: ["ドレッシングやたれのpHをはかる。", "水やお湯のpHをはかる。", "水や油のpHをはかる"],
+    answer: 1,
+    answerNote: "リトマス紙はドレッシングやたれなどのpHをはかるために使う。",
+    vocab: [
+      { jp: "ドレッシング", reading: "どれっしんぐ", vi: "sốt trộn salad / dressing", example: "ドレッシングのpHをはかる。" },
+      { jp: "たれ（垂れ）", reading: "たれ", vi: "nước sốt / nước chấm", example: "たれのpHをはかる。" },
+    ]
+  },
+  {
+    num: 69,
+    topic: "bảo quản",
+    question: "惣菜を使う時でまちがっているものを一つえらびなさい。",
+    options: ["再解凍した惣菜を使った。", "時間が経過すると味がかわる。", "必ず冷蔵庫に入れる。"],
+    answer: 1,
+    answerNote: "再解凍した惣菜は品質・安全性が落ちるため使用してはいけない。",
+    vocab: [
+      { jp: "再解凍", reading: "さいかいとう", vi: "rã đông lần hai / rã đông lại", example: "再解凍した食品は使わない。" },
+      { jp: "時間が経過する", reading: "じかんがけいかする", vi: "thời gian trôi qua", example: "時間が経過すると味がかわる。" },
+    ]
+  },
+  {
+    num: 70,
+    topic: "đo lường",
+    question: "フライヤーの油の品質のはかり方で正しいものを一つえらびなさい。",
+    options: ["リトマス紙で油の酸価の濃度をはかる。", "クロール紙で油のpHの濃度をはかる。", "AVチェッカーで酸価の濃度をはかる。"],
+    answer: 3,
+    answerNote: "AVチェッカーで油の酸価（Acid Value）をはかる。",
+    vocab: [
+      { jp: "酸価", reading: "さんか", vi: "chỉ số axit (AV - Acid Value)", example: "油の酸価をはかる。" },
+    ]
+  },
+  {
+    num: 71,
+    topic: "quy tắc",
+    question: "工場内に何を持ち込めますか 正しいものを一つえらびなさい。",
+    options: ["ロッカーのカギ", "ピアス", "輪ゴム"],
+    answer: 1,
+    answerNote: "工場内に持ち込めるのはロッカーの鍵のみ。",
+    vocab: [
+      { jp: "ピアス", reading: "ぴあす", vi: "bông tai đeo lỗ / khuyên tai", example: "" },
+    ]
+  },
+  {
+    num: 72,
+    topic: "vệ sinh",
+    question: "洗浄するときのポイントとしてまちがっているものを一つえらびなさい。",
+    options: ["使用した器具は必ず洗浄。", "洗浄するときは殺菌剤を使用。", "泡を立てて洗浄。"],
+    answer: 2,
+    answerNote: "洗浄には洗浄剤を使う。殺菌剤は洗浄後の消毒に使うもので、洗浄には使わない。",
+    vocab: [
+      { jp: "泡を立てる", reading: "あわをたてる", vi: "tạo bọt", example: "泡を立てて洗浄する。" },
+    ]
+  },
+  {
+    num: 73,
+    topic: "bảo quản",
+    question: "消費期限がすぎたものはなぜ使えないか正しいものを一つえらびなさい。",
+    options: ["食中毒になる恐れがあるから。", "期限までに消費しないといけないから。", "味が変わり美味しくないから。"],
+    answer: 1,
+    answerNote: "消費期限切れは食中毒のリスクがあるため使用不可。",
+    vocab: [
+      { jp: "消費期限", reading: "しょうひきげん", vi: "hạn sử dụng", example: "消費期限を確認する。" },
+      { jp: "恐れ", reading: "おそれ", vi: "nguy cơ / khả năng xảy ra", example: "食中毒になる恐れがある。" },
+    ]
+  },
+  {
+    num: 74,
+    topic: "nấu ăn",
+    question: "炒めるときの作業の注意点についてまちがっているものを一つえらびなさい。",
+    options: ["やけどに注意する。", "油を使わないで調理する。", "色々な食材を使い調理する。"],
+    answer: 2,
+    answerNote: "炒め物は油を使って調理する。油なしでは炒め物にならない。",
+    vocab: [
+      { jp: "炒める", reading: "いためる", vi: "xào", example: "野菜を炒める。" },
+      { jp: "色々な", reading: "いろいろな", vi: "đa dạng / nhiều loại", example: "色々な食材。" },
+    ]
+  },
+  {
+    num: 75,
+    topic: "khử trùng",
+    question: "洗剤・殺菌剤の注意点でまちがっているものを一つえらびなさい。",
+    options: ["洗剤・洗浄剤は殺菌剤の代わりになる。", "洗剤を使用するときは目に入らないようにする。", "洗剤・洗浄剤は食材や器具を洗うときに使う。"],
+    answer: 1,
+    answerNote: "洗剤は汚れを落とすもの、殺菌剤は細菌を殺すもので代替不可。",
+    vocab: [
+      { jp: "代わり", reading: "かわり", vi: "thay thế", example: "殺菌剤の代わりになる。（間違い）" },
+    ]
+  },
+  {
+    num: 76,
+    topic: "vệ sinh",
+    question: "体調が悪いときの注意点でまちがっているものを一つえらびなさい。",
+    options: ["体調が悪かったので上司に報告した。", "頭が痛かったが我慢して仕事した。", "朝からげりだったので上司に報告した。"],
+    answer: 2,
+    answerNote: "頭痛があっても我慢して仕事するのは間違い。報告が必要。",
+    vocab: [
+      { jp: "頭が痛い", reading: "あたまがいたい", vi: "đau đầu", example: "頭が痛かった。" },
+      { jp: "我慢する", reading: "がまんする", vi: "chịu đựng / nhịn", example: "我慢して仕事する。（間違い）" },
+    ]
+  },
+  {
+    num: 77,
+    topic: "nấu ăn",
+    question: "コロッケの温度のはかりかたで正しいものを一つえらびなさい。（A・B・C）",
+    options: ["A（端）", "B（中央）", "C（端）"],
+    answer: 2,
+    answerNote: "コロッケは中央（B）に温度計を刺して中心温度をはかる。",
+    vocab: [
+      { jp: "温度計", reading: "おんどけい", vi: "nhiệt kế", example: "温度計をさす。" },
+      { jp: "中央", reading: "ちゅうおう", vi: "chính giữa / trung tâm", example: "コロッケの中央に刺す。" },
+    ]
+  },
+  {
+    num: 78,
+    topic: "máy móc",
+    question: "フライヤーの使い方で正しいものを一つえらびなさい。",
+    options: ["温度を確認しないで揚げる。", "温度を確認してから揚げる。", "油から煙が出てから揚げる。"],
+    answer: 2,
+    answerNote: "揚げる前に必ず油の温度を確認してから揚げる。",
+    vocab: [
+      { jp: "煙", reading: "けむり", vi: "khói", example: "油から煙が出る。" },
+    ]
+  },
+  {
+    num: 79,
+    topic: "máy móc",
+    question: "和える機械はどんな機械ですか正しいものを一つえらびなさい。",
+    options: ["いろいろな野菜を混ぜる機械。", "調味料などを混ぜる機械。", "小麦粉をこねる機械。"],
+    answer: 2,
+    answerNote: "和える機械（サラダミキサー）は調味料などを混ぜる機械。",
+    vocab: [
+      { jp: "こねる", reading: "こねる", vi: "nhào (bột) / trộn nhào", example: "小麦粉をこねる。" },
+    ]
+  },
+  {
+    num: 80,
+    topic: "quy tắc",
+    question: "整理・整頓の方法でまちがっているものを一つえらびなさい。",
+    options: ["使用した道具をそのまま置いて別の作業をした。", "使用した道具をもとの場所に戻した。", "使わなくなったので捨てた。"],
+    answer: 1,
+    answerNote: "使った道具はそのまま置かず、元の場所に戻す。",
+    vocab: []
+  },
+  {
+    num: 81,
+    topic: "bảo quản",
+    question: "食材を使う時でまちがっているものを一つえらびなさい。",
+    options: ["再解凍した肉や魚を使った。", "肉や魚は時間が経過すると色がかわるのですぐに使った。", "必ず冷蔵庫に入れる。"],
+    answer: 1,
+    answerNote: "再解凍した食材は品質・安全性が低下するため使用してはいけない。",
+    vocab: []
+  },
+  {
+    num: 82,
+    topic: "nấu ăn",
+    question: "煮る物をするときの注意点について正しいものを一つえらびなさい。",
+    options: ["煮る野菜は時間が違う物がある。", "煮つめすぎると味が変わる。", "煮るときは火が弱ければ弱い方がいい。"],
+    answer: 1,
+    answerNote: "野菜によって煮る時間が異なるため、それぞれ適切な時間で煮る必要がある。",
+    vocab: [
+      { jp: "煮つめる", reading: "につめる", vi: "kho cạn / nấu cô đặc", example: "煮つめすぎると味が変わる。" },
+    ]
+  },
+  {
+    num: 83,
+    topic: "vệ sinh",
+    question: "器具を使うときの注意点でまちがっているものを一つえらびなさい。",
+    options: ["消毒した手だから、器具は消毒しなくてもよい。", "器具を使うとき、毎回消毒する。", "確認をしてから器具を消毒した。"],
+    answer: 1,
+    answerNote: "手を消毒しても器具も別途消毒が必要。",
+    vocab: []
+  },
+  {
+    num: 84,
+    topic: "an toàn",
+    question: "作業場で転ばないための正しいものを一つえらびなさい。",
+    options: ["床にこぼれた水や油はそのままにしておく。", "かいだんをのぼる時はてすりをつかまなくていい。", "くつはうらのみぞがすくないから換えてもらう。"],
+    answer: 3,
+    answerNote: "靴裏の溝が少なくなったら滑り防止のため換える。",
+    vocab: []
+  },
+  {
+    num: 85,
+    topic: "quy tắc",
+    question: "商品のマニュアルについて正しいものを一つえらびなさい。",
+    options: ["商品の名前や盛付けが書いてあるもの。", "作業のやり方、注意点が書かれている。", "機械の名前が書いてある。"],
+    answer: 1,
+    answerNote: "商品マニュアルは商品名や盛り付け方が書かれているもの。",
+    vocab: [
+      { jp: "マニュアル", reading: "まにゅある", vi: "hướng dẫn / tài liệu quy trình", example: "マニュアルを確認する。" },
+      { jp: "盛り付け", reading: "もりつけ", vi: "cách trình bày / bày đĩa", example: "盛り付けの方法。" },
+    ]
+  },
+  {
+    num: 86,
+    topic: "quy tắc",
+    question: "機械のマニュアルについて正しいものを一つえらびなさい。",
+    options: ["商品の名前が書いてあるもの。", "機械の取り扱いや、注意点が書かれている。", "機械の名前が書いてある。"],
+    answer: 2,
+    answerNote: "機械マニュアルは機械の取り扱い方法と注意点が書かれている。",
+    vocab: [
+      { jp: "取り扱い", reading: "とりあつかい", vi: "cách sử dụng / cách vận hành", example: "機械の取り扱い方法。" },
+    ]
+  },
+  {
+    num: 87,
+    topic: "máy móc",
+    question: "機械の取り外しについてまちがっているものを一つえらびなさい。",
+    options: ["取り外しのできる部品は、取り外してそうじする。", "取り外しのできる部品は、取り外さないでそうじする。", "スライサーを洗うときは、カバーを取り外してから洗う"],
+    answer: 2,
+    answerNote: "取り外せる部品は取り外して掃除するのが正しい方法。",
+    vocab: [
+      { jp: "取り外し", reading: "とりはずし", vi: "tháo ra / gỡ ra", example: "部品を取り外す。" },
+      { jp: "部品", reading: "ぶひん", vi: "phụ tùng / linh kiện", example: "機械の部品。" },
+    ]
+  },
+  {
+    num: 88,
+    topic: "quy tắc",
+    question: "作業のマニュアルについて正しいものを一つえらびなさい。",
+    options: ["商品の名前や盛り付けが書いてあるもの。", "作業のやり方、注意点が書かれている。", "機械の名前が書いてある。"],
+    answer: 2,
+    answerNote: "作業マニュアルは作業のやり方と注意点が書かれている。",
+    vocab: []
+  },
+  {
+    num: 89,
+    topic: "nấu ăn",
+    question: "調味料について正しいものを一つえらびなさい。",
+    options: ["調味料は味や風味をつけるために使う", "調味料は惣菜の材料ではない。", "調味料を使うときは適当に使う。"],
+    answer: 1,
+    answerNote: "調味料は味や風味をつけるために使う。量は適当でなく正確に計量する。",
+    vocab: [
+      { jp: "風味", reading: "ふうみ", vi: "hương vị / mùi vị", example: "風味をつける。" },
+      { jp: "適当", reading: "てきとう", vi: "tùy tiện / không chính xác", example: "適当に使う。（間違い）" },
+    ]
+  },
+  {
+    num: 90,
+    topic: "nấu ăn",
+    question: "加熱方法のしかたについて正しいものを一つえらびなさい。",
+    options: ["食材と食材をかさねて加熱調理した。", "食材と食材をくっつけて加熱調理した。", "食材と食材にすきまを空けて加熱調理した。"],
+    answer: 3,
+    answerNote: "食材同士をくっつけず、すきまを空けて加熱することで均一に火が通る。",
+    vocab: [
+      { jp: "かさねる", reading: "かさねる", vi: "chồng lên nhau", example: "食材をかさねる。" },
+      { jp: "くっつける", reading: "くっつける", vi: "dán vào nhau / áp vào nhau", example: "食材をくっつける。" },
+      { jp: "すきまを空ける", reading: "すきまをあける", vi: "để khoảng cách / không chen chúc", example: "すきまを空けて加熱する。" },
+    ]
+  },
+  {
+    num: 91,
+    topic: "bảo quản",
+    question: "食品の保管方法のしかたについて正しいものを一つえらびなさい。",
+    options: ["冷蔵庫にいちどにたくさんの食品をいれた。", "食品と食品の間にすきまをあけて冷蔵庫へいれた。", "すきまを空けてそのまま常温保管した。"],
+    answer: 2,
+    answerNote: "冷蔵庫内は食品間にすきまを作り、冷気が循環するようにする。",
+    vocab: [
+      { jp: "いちどに", reading: "いちどに", vi: "cùng một lúc / một lần nhiều", example: "いちどにたくさん入れない。" },
+      { jp: "常温", reading: "じょうおん", vi: "nhiệt độ phòng", example: "常温で保管する。" },
+    ]
+  },
+  {
+    num: 92,
+    topic: "ngộ độc",
+    question: "食品を食べた人の体に危害を与えるものを一つえらびなさい。",
+    options: ["生物的ハザードのアニサキスやクドア。", "科学的ハザードのカンピロバクター菌や金属異物。", "物理的ハザードのキノコ毒やサルモネラ菌。"],
+    answer: 1,
+    answerNote: "アニサキスやクドアは寄生虫で、生物的ハザードが正しい分類。",
+    vocab: [
+      { jp: "危害", reading: "きがい", vi: "gây hại / tổn hại", example: "体に危害を与える。" },
+      { jp: "生物的ハザード", reading: "せいぶつてきはざーど", vi: "mối nguy sinh học (biological hazard)", example: "細菌・ウイルス・寄生虫。" },
+      { jp: "アニサキス", reading: "あにさきす", vi: "ký sinh trùng Anisakis (trong cá biển)", example: "アニサキスによる食中毒。" },
+      { jp: "クドア", reading: "くどあ", vi: "ký sinh trùng Kudoa (trong cá bơn)", example: "" },
+      { jp: "カンピロバクター菌", reading: "かんぴろばくたーきん", vi: "vi khuẩn Campylobacter", example: "" },
+      { jp: "サルモネラ菌", reading: "さるもねらきん", vi: "vi khuẩn Salmonella", example: "" },
+    ]
+  },
+  {
+    num: 93,
+    topic: "an toàn",
+    question: "やけどを防ぐ方法でまちがっているものを一つえらびなさい。",
+    options: ["熱い油が手につかないように容器に入れた。", "オーブンから取り出すとき素手で出した。", "茹でるときお湯が目に入らないようにゴーグルを着けた。"],
+    answer: 2,
+    answerNote: "オーブンから取り出す際は素手でなく耐熱手袋などを使う。",
+    vocab: [
+      { jp: "オーブン", reading: "おーぶん", vi: "lò nướng", example: "オーブンで焼く。" },
+      { jp: "素手", reading: "すで", vi: "tay trần / không đeo găng tay", example: "素手で触らない。" },
+      { jp: "ゴーグル", reading: "ごーぐる", vi: "kính bảo hộ", example: "ゴーグルを着ける。" },
+    ]
+  },
+  {
+    num: 94,
+    topic: "vệ sinh",
+    question: "まな板を使用するときのポイントとしてまちがっているものを一つえらびなさい。",
+    options: ["野菜や肉を切るときはまな板は交換しない。", "まな板を使用するときは殺菌剤をつかう。", "まな板は食材を切るときに使う。"],
+    answer: 1,
+    answerNote: "野菜と肉は専用のまな板に交換して使う。",
+    vocab: []
+  },
+  {
+    num: 95,
+    topic: "an toàn",
+    question: "包丁の使い方で正しいものを一つえらびなさい。",
+    options: ["包丁を使うときまわりを見ないで使う。", "包丁を使うときまわりを見て使う。", "包丁の刃がかけていても使う。"],
+    answer: 2,
+    answerNote: "包丁使用時は常に周囲を確認してから使う。",
+    vocab: []
+  },
+  {
+    num: 96,
+    topic: "vệ sinh",
+    question: "なぜ消毒をするのか正しいものを一つえらびなさい。",
+    options: ["清潔であるから。", "ばい菌を工場内に入れないため。", "怪我をしているから。"],
+    answer: 2,
+    answerNote: "消毒の目的はばい菌（微生物）を工場内に持ち込ませないため。",
+    vocab: [
+      { jp: "ばい菌", reading: "ばいきん", vi: "vi trùng / mầm bệnh", example: "ばい菌を入れない。" },
+    ]
+  },
+  {
+    num: 97,
+    topic: "trang phục",
+    question: "どうしてマスクをかけないといけないか、正しいものを一つえらびなさい。",
+    options: ["商品につばが入らないため。", "風邪を引いているため。", "誰かわからなくするため。"],
+    answer: 1,
+    answerNote: "マスクは唾液（つば）や微生物が商品に入らないようにするため。",
+    vocab: [
+      { jp: "つば（唾）", reading: "つば", vi: "nước bọt", example: "つばが食品に入らないようにする。" },
+      { jp: "風邪を引く", reading: "かぜをひく", vi: "bị cảm", example: "風邪を引いているから。" },
+    ]
+  },
+  {
+    num: 98,
+    topic: "trang phục",
+    question: "なぜ手ぶくろをはめるのか正しいものを一つえらびなさい。",
+    options: ["やけどを防ぐため。", "手についた雑菌を防ぐため。", "臭いをつけないため。"],
+    answer: 2,
+    answerNote: "手袋の目的は手の雑菌が食品に付かないようにすること。",
+    vocab: []
+  },
+  {
+    num: 99,
+    topic: "vệ sinh",
+    question: "健康チェックでまちがっているものを一つえらびなさい。",
+    options: ["熱が38℃あったが出勤して仕事した。", "健康チェックしないと工場内に入れない。", "健康チェックは毎日出勤したときに行う。"],
+    answer: 1,
+    answerNote: "38℃の熱がある場合は出勤してはいけない。",
+    vocab: []
+  },
+  {
+    num: 100,
+    topic: "khử trùng",
+    question: "殺菌剤を使用するポイントでまちがっているものを一つえらびなさい。",
+    options: ["殺菌する時間と濃度と温度。", "殺菌する時間と決められた濃度。", "殺菌する時、目に入らないようにする。"],
+    answer: 1,
+    answerNote: "殺菌剤の主要ポイントは時間と決められた濃度。温度は補助的要素。",
+    vocab: []
+  },
+  {
+    num: 101,
+    topic: "khử trùng",
+    question: "消毒をするときのポイントとしてまちがっているものを一つえらびなさい。",
+    options: ["乾かしてから消毒する。", "殺菌剤やアルコールを使う。", "濡れた手で消毒。"],
+    answer: 3,
+    answerNote: "消毒前は乾燥させてから行う。濡れた状態での消毒は効果が薄れる。",
+    vocab: [
+      { jp: "濡れた", reading: "ぬれた", vi: "ướt / bị ướt", example: "濡れた手で消毒しない。" },
+    ]
+  }
+];
+
+// Count total vocab
+let totalVocab = 0;
+data.forEach(q => totalVocab += q.vocab.length);
+document.getElementById('totalV').textContent = totalVocab;
+
+let filteredData = [...data];
+let fcIndex = 0;
+let fcShown = false;
+let allVocab = [];
+data.forEach(q => q.vocab.forEach(v => allVocab.push({...v, qNum: q.num})));
+
+function renderQuestions() {
+  const list = document.getElementById('questionList');
+  const noResult = document.getElementById('noResult');
+  document.getElementById('showingQ').textContent = filteredData.length;
+
+  if (filteredData.length === 0) {
+    list.innerHTML = '';
+    noResult.style.display = 'block';
+    return;
+  }
+  noResult.style.display = 'none';
+
+  list.innerHTML = filteredData.map(q => {
+    const vocabRows = q.vocab.map(v => `
+      <tr>
+        <td><span class="jp">${v.jp}</span><br><span class="reading">${v.reading}</span></td>
+        <td class="vi">${v.vi}</td>
+        <td class="example">${v.example || ''}</td>
+      </tr>
+    `).join('');
+
+    const optionHtml = q.options.map((o, i) => `
+      <div class="option" style="color:${i+1===q.answer?'#27ae60':'#444'}">
+        ${i+1}. ${o} ${i+1===q.answer ? '✓' : ''}
+      </div>
+    `).join('');
+
+    return `
+      <div class="question-card" id="qcard-${q.num}">
+        <div class="q-header" onclick="toggleQ(${q.num})">
+          <div class="q-num">${q.num}</div>
+          <div class="q-title">${q.question}</div>
+          <div class="q-arrow" id="arrow-${q.num}">▼</div>
+        </div>
+        <div class="q-body" id="body-${q.num}">
+          <div class="q-text">
+            ${optionHtml}
+          </div>
+          <span class="answer-badge correct">✓ Đáp án: ${q.answer} — ${q.answerNote}</span>
+          ${q.vocab.length > 0 ? `
+          <table class="vocab-table">
+            <thead><tr><th>Từ / Kanji</th><th>Nghĩa tiếng Việt</th><th>Ví dụ</th></tr></thead>
+            <tbody>${vocabRows}</tbody>
+          </table>` : '<p style="color:#999;font-size:0.82rem">Từ vựng đã có ở câu trước.</p>'}
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+function toggleQ(num) {
+  const body = document.getElementById('body-' + num);
+  const arrow = document.getElementById('arrow-' + num);
+  body.classList.toggle('open');
+  arrow.classList.toggle('open');
+}
+
+function expandAll() {
+  filteredData.forEach(q => {
+    document.getElementById('body-' + q.num)?.classList.add('open');
+    document.getElementById('arrow-' + q.num)?.classList.add('open');
+  });
+}
+
+function collapseAll() {
+  filteredData.forEach(q => {
+    document.getElementById('body-' + q.num)?.classList.remove('open');
+    document.getElementById('arrow-' + q.num)?.classList.remove('open');
+  });
+}
+
+function filterQuestions() {
+  const search = document.getElementById('searchInput').value.toLowerCase();
+  const topic = document.getElementById('topicFilter').value;
+
+  filteredData = data.filter(q => {
+    const matchTopic = !topic || q.topic === topic;
+    const matchSearch = !search || 
+      q.num.toString().includes(search) ||
+      q.question.toLowerCase().includes(search) ||
+      q.vocab.some(v => v.jp.toLowerCase().includes(search) || v.vi.toLowerCase().includes(search) || v.reading.toLowerCase().includes(search));
+    return matchTopic && matchSearch;
+  });
+  renderQuestions();
+}
+
+// Flashcard
+function toggleFlashcard() {
+  const fc = document.getElementById('flashcardSection');
+  const nm = document.getElementById('normalMode');
+  if (fc.classList.contains('active')) {
+    fc.classList.remove('active');
+    nm.classList.remove('hidden');
+  } else {
+    fc.classList.add('active');
+    nm.classList.add('hidden');
+    fcIndex = 0;
+    fcShown = false;
+    showFC();
+  }
+}
+
+function showFC() {
+  const v = allVocab[fcIndex];
+  document.getElementById('fcJp').textContent = v.jp;
+  document.getElementById('fcReading').textContent = v.reading;
+  document.getElementById('fcVi').textContent = v.vi;
+  document.getElementById('fcVi').style.display = 'none';
+  document.getElementById('fcHint').textContent = '👆 Nhấn để xem nghĩa';
+  document.getElementById('fcProgress').textContent = `${fcIndex + 1} / ${allVocab.length}  |  Câu ${v.qNum}`;
+  fcShown = false;
+}
+
+function toggleFCAnswer() {
+  const vi = document.getElementById('fcVi');
+  const hint = document.getElementById('fcHint');
+  if (!fcShown) {
+    vi.style.display = 'block';
+    hint.textContent = '→ Nhấn tiếp để qua từ tiếp';
+    fcShown = true;
+  } else {
+    fcNext();
+  }
+}
+
+function fcNext() { fcIndex = (fcIndex + 1) % allVocab.length; showFC(); }
+function fcPrev() { fcIndex = (fcIndex - 1 + allVocab.length) % allVocab.length; showFC(); }
+function fcShuffle() {
+  for (let i = allVocab.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [allVocab[i], allVocab[j]] = [allVocab[j], allVocab[i]];
+  }
+  fcIndex = 0;
+  showFC();
+}
+
+renderQuestions();
+</script>
+</body>
+</html>
